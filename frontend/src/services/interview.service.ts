@@ -32,7 +32,7 @@ export const interviewApi = {
     Object.entries(filters).forEach(([key, value]) => {
       if (value) params.append(key, value);
     });
-    
+
     const response = await api.get(`/api/interviews?${params.toString()}`);
     return response.data;
   },

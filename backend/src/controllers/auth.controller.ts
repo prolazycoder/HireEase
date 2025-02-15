@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { RequestHandler } from "express";
-import { User, IUserDocument } from "../models/User";
 
 export const authController = {
   getUser: (async (req: Request, res: Response) => {

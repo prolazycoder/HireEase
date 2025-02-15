@@ -63,4 +63,71 @@ export const interviewController = {
       void res.status(500).json({ error: "Failed to delete interview" });
     }
   }) as RequestHandler,
+
+  getInterviews: (async (req, res) => {
+    try {
+      const { status, candidateName } = req.query;
+      const query: any = { userId: req.user.id };
+
+      // Filter by candidate name if provided
+      if (candidateName) {
+        query.candidateName = { $regex: candidateName, $options: "i" };
+      }
+
+      // Get current date and time
+      const now = new Date();
+      const currentDate = now.toISOString().split("T")[0];
+      const currentTime = now.toTimeString().split(" ")[0];
+
+      // Filter by status
+      if (status === "upcoming") {
+        query.$or = [
+          { date: { $gt: currentDate } },
+          {
+            date: currentDate,
+            startTime: { $gt: currentTime },
+          },
+        ];
+      } else if (status === "ongoing") {
+        query.date = currentDate;
+        query.startTime = { $lte: currentTime };
+        query.endTime = { $gt: currentTime };
+      } else if (status === "completed") {
+        query.$or = [
+          { date: { $lt: currentDate } },
+          {
+            date: currentDate,
+            endTime: { $lte: currentTime },
+          },
+        ];
+      }
+
+      const interviews = await Interview.find(query)
+        .sort({ date: 1, startTime: 1 })
+        .exec();
+
+      // Add dynamic status to each interview
+      const interviewsWithStatus = interviews.map((interview) => {
+        const doc = interview.toObject();
+        if (
+          doc.date < currentDate ||
+          (doc.date === currentDate && doc.endTime <= currentTime)
+        ) {
+          doc.status = "completed";
+        } else if (
+          doc.date > currentDate ||
+          (doc.date === currentDate && doc.startTime > currentTime)
+        ) {
+          doc.status = "upcoming";
+        } else {
+          doc.status = "ongoing";
+        }
+        return doc;
+      });
+
+      res.json({ interviews: interviewsWithStatus });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch interviews" });
+    }
+  }) as RequestHandler,
 };

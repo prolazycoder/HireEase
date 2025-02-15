@@ -8,7 +8,7 @@ export interface IInterview {
   startTime: string;
   endTime: string;
   description?: string;
-  status: "scheduled" | "completed" | "cancelled";
+  status: "upcoming" | "ongoing" | "completed";
   userId: string;
   createdAt: Date;
   updatedAt: Date;
@@ -44,15 +44,11 @@ const interviewSchema = new mongoose.Schema<IInterviewDocument>({
   description: {
     type: String,
   },
-  status: {
-    type: String,
-    enum: ["scheduled", "completed", "cancelled"],
-    default: "scheduled",
-  },
   userId: {
     type: String,
     required: true,
-  },
+    index: true,
+  }
 }, {
   timestamps: true,
 });

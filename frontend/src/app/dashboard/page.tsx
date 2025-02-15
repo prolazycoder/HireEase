@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import { interviewApi } from "@/services/api";
+import { interviewApi } from "@/services/interview.service";
 import {
   Button,
   Dialog,
@@ -15,6 +15,7 @@ import {
 import { Add as AddIcon } from "@mui/icons-material";
 import InterviewForm, { InterviewFormData } from "@/components/InterviewForm";
 import InterviewList from "@/components/InterviewList";
+import { InterviewFilters } from "@/components/InterviewFilters";
 
 interface Interview extends InterviewFormData {
   _id: string;
@@ -31,19 +32,29 @@ export default function Dashboard() {
 
   const [interviews, setInterviews] = useState<Interview[]>([]);
   const [isFormOpen, setIsFormOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [selectedStatus, setSelectedStatus] = useState("upcoming");
+
+  const fetchInterviews = async (filters = {}) => {
+    try {
+      setLoading(true);
+      const { interviews } = await interviewApi.getInterviews(filters);
+      setInterviews(interviews);
+    } catch (error) {
+      console.error("Failed to fetch interviews:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFilterChange = (filters: any) => {
+    setSelectedStatus(filters.status);
+    fetchInterviews(filters);
+  };
 
   useEffect(() => {
     fetchInterviews();
   }, []);
-
-  const fetchInterviews = async () => {
-    try {
-      const { interviews } = await interviewApi.getForthcoming();
-      setInterviews(interviews);
-    } catch (error) {
-      console.error("Failed to fetch interviews:", error);
-    }
-  };
 
   const handleCreateInterview = async (data: InterviewFormData) => {
     try {
@@ -73,6 +84,19 @@ export default function Dashboard() {
     }
   };
 
+  const getStatusHeading = () => {
+    switch (selectedStatus) {
+      case "ongoing":
+        return "Ongoing Interviews";
+      case "completed":
+        return "Completed Interviews";
+      case "all":
+        return "All Interviews";
+      default:
+        return "Upcoming Interviews";
+    }
+  };
+
   if (status === "loading") {
     return <div>Loading...</div>;
   }
@@ -87,7 +111,7 @@ export default function Dashboard() {
           mb={4}
         >
           <Typography variant="h4" component="h1" color="primary">
-            Upcoming Interviews
+            {getStatusHeading()}
           </Typography>
           <Button
             variant="contained"
@@ -104,15 +128,26 @@ export default function Dashboard() {
           </Button>
         </Box>
 
-        {interviews.length === 0 ? (
+        <InterviewFilters onFilterChange={handleFilterChange} />
+
+        {loading ? (
           <Paper
             sx={{ p: 4, textAlign: "center", bgcolor: "background.paper" }}
           >
             <Typography variant="h6" color="text.secondary" gutterBottom>
-              No upcoming interviews
+              Loading interviews...
+            </Typography>
+          </Paper>
+        ) : interviews.length === 0 ? (
+          <Paper
+            sx={{ p: 4, textAlign: "center", bgcolor: "background.paper" }}
+          >
+            <Typography variant="h6" color="text.secondary" gutterBottom>
+              No {selectedStatus === "all" ? "" : selectedStatus} interviews
+              found
             </Typography>
             <Typography color="text.secondary">
-              Click the button above to schedule your first interview
+              Click the button above to schedule a new interview
             </Typography>
           </Paper>
         ) : (
