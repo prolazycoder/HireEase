@@ -16,20 +16,6 @@ export const interviewController = {
     }
   }) as RequestHandler,
 
-  getForthcomingInterviews: (async (req, res) => {
-    try {
-      const interviews = await Interview.find({
-        userId: req.user.id,
-        date: { $gte: new Date().toISOString().split("T")[0] },
-        status: "scheduled",
-      }).sort({ date: 1, startTime: 1 });
-
-      void res.json({ interviews });
-    } catch (error) {
-      void res.status(500).json({ error: "Failed to fetch interviews" });
-    }
-  }) as RequestHandler,
-
   updateInterview: (async (req, res) => {
     try {
       const interview = await Interview.findOneAndUpdate(

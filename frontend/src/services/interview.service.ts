@@ -1,5 +1,5 @@
 import axios from "axios";
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -11,10 +11,25 @@ api.interceptors.request.use(async (config) => {
 
   if (session?.accessToken) {
     config.headers.Authorization = `Bearer ${session.accessToken}`;
+  } else {
+    // No token found, sign out
+    signOut({ callbackUrl: "/" });
   }
 
   return config;
 });
+
+// Add response interceptor to handle token expiration
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      // Unauthorized, token might be expired
+      await signOut({ callbackUrl: "/" });
+    }
+    return Promise.reject(error);
+  }
+);
 
 interface FilterParams {
   status?: string;

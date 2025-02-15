@@ -9,7 +9,6 @@ router.use(authMiddleware as RequestHandler);
 
 router.post("/", interviewController.createInterview);
 router.get("/", interviewController.getInterviews);
-router.get("/forthcoming", interviewController.getForthcomingInterviews);
 router.put("/:id", interviewController.updateInterview);
 router.delete("/:id", interviewController.deleteInterview);
 
