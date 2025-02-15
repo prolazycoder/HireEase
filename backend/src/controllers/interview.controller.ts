@@ -6,7 +6,7 @@ export const interviewController = {
     try {
       const interview = await Interview.create({
         ...req.body,
-        userId: req.user._id // Add user ID from auth
+        userId: req.user.id,
       });
       void res.status(201).json({ interview });
     } catch (error) {
@@ -17,11 +17,10 @@ export const interviewController = {
   getForthcomingInterviews: (async (req, res) => {
     try {
       const interviews = await Interview.find({
-        userId: req.user._id, // Filter by user ID
-        date: { $gte: new Date().toISOString().split('T')[0] },
-        status: "scheduled"
-      })
-        .sort({ date: 1, startTime: 1 });
+        userId: req.user.id,
+        date: { $gte: new Date().toISOString().split("T")[0] },
+        status: "scheduled",
+      }).sort({ date: 1, startTime: 1 });
 
       void res.json({ interviews });
     } catch (error) {
@@ -32,9 +31,9 @@ export const interviewController = {
   updateInterview: (async (req, res) => {
     try {
       const interview = await Interview.findOneAndUpdate(
-        { 
+        {
           _id: req.params.id,
-          userId: req.user._id // Ensure user owns the interview
+          userId: req.user.id,
         },
         req.body,
         { new: true }
@@ -53,7 +52,7 @@ export const interviewController = {
     try {
       const interview = await Interview.findOneAndDelete({
         _id: req.params.id,
-        userId: req.user._id // Ensure user owns the interview
+        userId: req.user.id,
       });
       if (!interview) {
         void res.status(404).json({ error: "Interview not found" });
@@ -63,5 +62,5 @@ export const interviewController = {
     } catch (error) {
       void res.status(500).json({ error: "Failed to delete interview" });
     }
-  }) as RequestHandler
-}; 
+  }) as RequestHandler,
+};

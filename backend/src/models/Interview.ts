@@ -1,4 +1,4 @@
-import mongoose, { Document } from "mongoose";
+import mongoose from 'mongoose';
 
 export interface IInterview {
   title: string;
@@ -9,12 +9,12 @@ export interface IInterview {
   endTime: string;
   description?: string;
   status: "scheduled" | "completed" | "cancelled";
-  userId: mongoose.Types.ObjectId;
+  userId: string;
   createdAt: Date;
   updatedAt: Date;
 }
 
-export interface IInterviewDocument extends IInterview, Document {}
+export interface IInterviewDocument extends IInterview, mongoose.Document {}
 
 const interviewSchema = new mongoose.Schema<IInterviewDocument>({
   title: {
@@ -50,10 +50,8 @@ const interviewSchema = new mongoose.Schema<IInterviewDocument>({
     default: "scheduled",
   },
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    type: String,
     required: true,
-    index: true,
   },
 }, {
   timestamps: true,
