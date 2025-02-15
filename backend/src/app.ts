@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { authRoutes } from './routes/auth.routes';
 import { interviewRoutes } from './routes/interview.routes';
+import { initializeDatabase } from './config/db.init';
 
 // Load environment variables
 dotenv.config();
@@ -20,16 +21,12 @@ app.use(express.json());
 // Database Connection with better error handling
 mongoose
   .connect(process.env.MONGODB_URI!)
-  .then(() => {
-    console.log("Connected to MongoDB:", process.env.MONGODB_URI);
-    console.log("Connection state:", mongoose.connection.readyState);
+  .then(async () => {
+    console.log("Connected to MongoDB");
+    await initializeDatabase();
   })
   .catch((err) => {
-    console.error("MongoDB connection error details:", {
-      error: err.message,
-      code: err.code,
-      uri: process.env.MONGODB_URI
-    });
+    console.error("MongoDB connection error:", err);
   });
 
 // Routes

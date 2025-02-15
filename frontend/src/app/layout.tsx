@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { getServerSession } from "next-auth";
 import { NextAuthProvider } from "@/providers/auth-provider";
+import { ThemeProvider } from "@/providers/theme-provider";
 import { Navbar } from "@/components/common/Navbar";
 import { authOptions } from "@/lib/auth";
 import "./globals.css";
@@ -27,8 +28,10 @@ export default async function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} antialiased`}>
         <NextAuthProvider>
-          <Navbar session={session} />
-          <main className="pt-16">{children}</main>
+          <ThemeProvider>
+            <Navbar session={session} />
+            <main className="pt-16">{children}</main>
+          </ThemeProvider>
         </NextAuthProvider>
       </body>
     </html>

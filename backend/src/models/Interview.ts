@@ -1,20 +1,22 @@
 import mongoose, { Document } from "mongoose";
 
-export interface IInterview extends Document {
+export interface IInterview {
   title: string;
   candidateName: string;
   candidateEmail: string;
-  date: Date;
+  date: string;
   startTime: string;
   endTime: string;
   description?: string;
   status: "scheduled" | "completed" | "cancelled";
-  createdBy: mongoose.Types.ObjectId;
+  userId: mongoose.Types.ObjectId;
   createdAt: Date;
   updatedAt: Date;
 }
 
-const interviewSchema = new mongoose.Schema({
+export interface IInterviewDocument extends IInterview, Document {}
+
+const interviewSchema = new mongoose.Schema<IInterviewDocument>({
   title: {
     type: String,
     required: true,
@@ -28,7 +30,7 @@ const interviewSchema = new mongoose.Schema({
     required: true,
   },
   date: {
-    type: Date,
+    type: String,
     required: true,
   },
   startTime: {
@@ -47,13 +49,16 @@ const interviewSchema = new mongoose.Schema({
     enum: ["scheduled", "completed", "cancelled"],
     default: "scheduled",
   },
-  createdBy: {
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
+    index: true,
   },
 }, {
   timestamps: true,
 });
 
-export const Interview = mongoose.model<IInterview>("Interview", interviewSchema); 
+interviewSchema.index({ userId: 1, date: 1 });
+
+export const Interview = mongoose.model<IInterviewDocument>("Interview", interviewSchema); 

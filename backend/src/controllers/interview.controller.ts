@@ -6,11 +6,10 @@ export const interviewController = {
     try {
       const interview = await Interview.create({
         ...req.body,
-        createdBy: req.user.id, // Will be set by auth middleware
+        userId: req.user._id // Add user ID from auth
       });
       void res.status(201).json({ interview });
     } catch (error) {
-      console.error("Create interview error:", error);
       void res.status(500).json({ error: "Failed to create interview" });
     }
   }) as RequestHandler,
@@ -18,16 +17,14 @@ export const interviewController = {
   getForthcomingInterviews: (async (req, res) => {
     try {
       const interviews = await Interview.find({
-        createdBy: req.user.id,
-        date: { $gte: new Date() },
-        status: "scheduled",
+        userId: req.user._id, // Filter by user ID
+        date: { $gte: new Date().toISOString().split('T')[0] },
+        status: "scheduled"
       })
-        .sort({ date: 1, startTime: 1 })
-        .populate("createdBy", "name email");
+        .sort({ date: 1, startTime: 1 });
 
-      void res.status(200).json({ interviews });
+      void res.json({ interviews });
     } catch (error) {
-      console.error("Get interviews error:", error);
       void res.status(500).json({ error: "Failed to fetch interviews" });
     }
   }) as RequestHandler,
@@ -35,7 +32,10 @@ export const interviewController = {
   updateInterview: (async (req, res) => {
     try {
       const interview = await Interview.findOneAndUpdate(
-        { _id: req.params.id, createdBy: req.user.id },
+        { 
+          _id: req.params.id,
+          userId: req.user._id // Ensure user owns the interview
+        },
         req.body,
         { new: true }
       );
@@ -43,9 +43,8 @@ export const interviewController = {
         void res.status(404).json({ error: "Interview not found" });
         return;
       }
-      void res.status(200).json({ interview });
+      void res.json({ interview });
     } catch (error) {
-      console.error("Update interview error:", error);
       void res.status(500).json({ error: "Failed to update interview" });
     }
   }) as RequestHandler,
@@ -54,16 +53,15 @@ export const interviewController = {
     try {
       const interview = await Interview.findOneAndDelete({
         _id: req.params.id,
-        createdBy: req.user.id,
+        userId: req.user._id // Ensure user owns the interview
       });
       if (!interview) {
         void res.status(404).json({ error: "Interview not found" });
         return;
       }
-      void res.status(200).json({ message: "Interview deleted successfully" });
+      void res.json({ message: "Interview deleted successfully" });
     } catch (error) {
-      console.error("Delete interview error:", error);
       void res.status(500).json({ error: "Failed to delete interview" });
     }
-  }) as RequestHandler,
+  }) as RequestHandler
 }; 
