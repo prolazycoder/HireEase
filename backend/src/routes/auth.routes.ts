@@ -1,8 +1,13 @@
-import express from 'express';
-import { authController } from '../controllers/auth.controller';
+import { Router } from "express";
+import { authController } from "../controllers/auth.controller";
+import { authMiddleware } from "../middleware/auth.middleware";
+import { RequestHandler } from "express";
 
-const router = express.Router();
+const router = Router();
 
-router.post('/google/callback', authController.googleCallback);
+router.use(authMiddleware as RequestHandler); 
 
-export const authRoutes = router; 
+router.post("/google/callback", authController.googleCallback);
+router.get("/user/:id", authController.getUser);
+
+export const authRoutes = router;

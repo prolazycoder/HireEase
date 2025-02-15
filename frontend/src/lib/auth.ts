@@ -20,7 +20,14 @@ export const authOptions: NextAuthOptions = {
     async signIn({ user, account }) {
       if (account?.provider === "google") {
         try {
-          await axios.post(
+          console.log("Sending user data to backend:", {
+            email: user.email,
+            name: user.name,
+            image: user.image,
+            googleId: account.providerAccountId,
+          });
+
+          const response = await axios.post(
             `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google/callback`,
             {
               email: user.email,
@@ -34,10 +41,16 @@ export const authOptions: NextAuthOptions = {
               },
             }
           );
+
+          console.log("Backend response:", response.data);
           return true;
         } catch (error) {
-          console.error("Error saving user:", error);
-          return true; // Still allow sign in even if backend fails
+          if (axios.isAxiosError(error)) {
+            console.error("Error saving user:", error.response?.data || error);
+          } else {
+            console.error("Error saving user:", error);
+          }
+          return true;
         }
       }
       return true;

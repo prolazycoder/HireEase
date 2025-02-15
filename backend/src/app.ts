@@ -3,6 +3,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import { authRoutes } from './routes/auth.routes';
+import { interviewRoutes } from './routes/interview.routes';
 
 // Load environment variables
 dotenv.config();
@@ -16,17 +17,31 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Database Connection
+// Database Connection with better error handling
 mongoose
   .connect(process.env.MONGODB_URI!)
-  .then(() => console.log("Connected to MongoDB"))
-  .catch((err) => console.error("MongoDB connection error:", err));
+  .then(() => {
+    console.log("Connected to MongoDB:", process.env.MONGODB_URI);
+    console.log("Connection state:", mongoose.connection.readyState);
+  })
+  .catch((err) => {
+    console.error("MongoDB connection error details:", {
+      error: err.message,
+      code: err.code,
+      uri: process.env.MONGODB_URI
+    });
+  });
 
-// Basic route
-app.get("/health", (req, res) => {
-  res.json({ status: "ok" });
-});
-
+// Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/interviews', interviewRoutes);
+
+// Health check with DB status
+app.get("/health", (req, res) => {
+  res.json({ 
+    status: "ok",
+    dbState: mongoose.connection.readyState
+  });
+});
 
 export default app;

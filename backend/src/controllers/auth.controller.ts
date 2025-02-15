@@ -1,26 +1,39 @@
-import { Request, Response } from 'express';
-import { User } from '../models/User';
+import { Request, Response, NextFunction, RequestHandler } from "express";
+import { User } from "../models/User";
+import jwt from "jsonwebtoken";
 
 export const authController = {
-  async googleCallback(req: Request, res: Response) {
+  googleCallback: (async (req, res) => {
     try {
       const { email, name, image, googleId } = req.body;
-
       let user = await User.findOne({ email });
 
       if (!user) {
-        user = await User.create({
-          email,
-          name,
-          image,
-          googleId,
-        });
+        user = await User.create({ email, name, image, googleId });
       }
 
-      return res.status(200).json({ user });
+      const token = jwt.sign(
+        { sub: user._id, email: user.email },
+        process.env.JWT_SECRET!,
+        { expiresIn: "7d" }
+      );
+
+      void res.json({ user, token });
     } catch (error) {
-      console.error('Google auth error:', error);
-      return res.status(500).json({ error: 'Authentication failed' });
+      void res.status(500).json({ error: "Authentication failed" });
     }
-  },
-}; 
+  }) as RequestHandler,
+
+  getUser: (async (req, res) => {
+    try {
+      const user = await User.findById(req.params.id).select("-googleId");
+      if (!user) {
+        void res.status(404).json({ error: "User not found" });
+        return;
+      }
+      void res.json({ user });
+    } catch (error) {
+      void res.status(500).json({ error: "Failed to fetch user" });
+    }
+  }) as RequestHandler,
+};
