@@ -35,7 +35,7 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState("upcoming");
 
-  const fetchInterviews = async (filters = {}) => {
+  const fetchInterviews = async (filters = { status: "upcoming" }) => {
     try {
       setLoading(true);
       const { interviews } = await interviewApi.getInterviews(filters);
@@ -128,7 +128,10 @@ export default function Dashboard() {
           </Button>
         </Box>
 
-        <InterviewFilters onFilterChange={handleFilterChange} />
+        <InterviewFilters 
+          onFilterChange={handleFilterChange}
+          defaultStatus="upcoming"
+        />
 
         {loading ? (
           <Paper
