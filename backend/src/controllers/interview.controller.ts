@@ -12,12 +12,17 @@ export const interviewController = {
         status: "upcoming",
       });
 
-      // Send email notification
-      await emailService.sendInterviewCreated(interview);
+      // Send response first
+      res.status(201).json({ interview });
 
-      void res.status(201).json({ interview });
+      // Handle email separately
+      try {
+        await emailService.sendInterviewCreated(interview);
+      } catch (emailError) {
+        console.error("Failed to send email:", emailError);
+      }
     } catch (error) {
-      void res.status(500).json({ error: "Failed to create interview" });
+      res.status(500).json({ error: "Failed to create interview" });
     }
   }) as RequestHandler,
 
@@ -33,12 +38,17 @@ export const interviewController = {
         return res.status(404).json({ error: "Interview not found" });
       }
 
-      // Send email notification
-      await emailService.sendInterviewUpdated(interview);
+      // Send response first
+      res.json({ interview });
 
-      void res.json({ interview });
+      // Handle email separately
+      try {
+        await emailService.sendInterviewUpdated(interview);
+      } catch (emailError) {
+        console.error("Failed to send email:", emailError);
+      }
     } catch (error) {
-      void res.status(500).json({ error: "Failed to update interview" });
+      res.status(500).json({ error: "Failed to update interview" });
     }
   }) as RequestHandler,
 
@@ -55,12 +65,17 @@ export const interviewController = {
 
       await Interview.deleteOne({ _id: req.params.id });
 
-      // Send email notification
-      await emailService.sendInterviewCancelled(interview);
+      // Send response first
+      res.json({ message: "Interview deleted successfully" });
 
-      void res.json({ message: "Interview deleted successfully" });
+      // Handle email separately
+      try {
+        await emailService.sendInterviewCancelled(interview);
+      } catch (emailError) {
+        console.error("Failed to send email:", emailError);
+      }
     } catch (error) {
-      void res.status(500).json({ error: "Failed to delete interview" });
+      res.status(500).json({ error: "Failed to delete interview" });
     }
   }) as RequestHandler,
 
