@@ -7,6 +7,7 @@ export const interviewController = {
       const interview = await Interview.create({
         ...req.body,
         userId: req.user.id,
+        status: "upcoming",
       });
       void res.status(201).json({ interview });
     } catch (error) {

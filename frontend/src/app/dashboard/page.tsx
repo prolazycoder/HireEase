@@ -19,7 +19,7 @@ import { InterviewFilters } from "@/components/InterviewFilters";
 
 interface Interview extends InterviewFormData {
   _id: string;
-  status: "scheduled" | "completed" | "cancelled";
+  status: "upcoming" | "ongoing" | "completed";
 }
 
 export default function Dashboard() {

@@ -1,4 +1,4 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 export interface IInterview {
   title: string;
@@ -16,43 +16,54 @@ export interface IInterview {
 
 export interface IInterviewDocument extends IInterview, mongoose.Document {}
 
-const interviewSchema = new mongoose.Schema<IInterviewDocument>({
-  title: {
-    type: String,
-    required: true,
+const interviewSchema = new mongoose.Schema<IInterviewDocument>(
+  {
+    title: {
+      type: String,
+      required: true,
+    },
+    candidateName: {
+      type: String,
+      required: true,
+    },
+    candidateEmail: {
+      type: String,
+      required: true,
+    },
+    date: {
+      type: String,
+      required: true,
+    },
+    startTime: {
+      type: String,
+      required: true,
+    },
+    endTime: {
+      type: String,
+      required: true,
+    },
+    description: {
+      type: String,
+    },
+    status: {
+      type: String,
+      enum: ["upcoming", "ongoing", "completed"],
+      default: "upcoming",
+    },
+    userId: {
+      type: String,
+      required: true,
+      index: true,
+    },
   },
-  candidateName: {
-    type: String,
-    required: true,
-  },
-  candidateEmail: {
-    type: String,
-    required: true,
-  },
-  date: {
-    type: String,
-    required: true,
-  },
-  startTime: {
-    type: String,
-    required: true,
-  },
-  endTime: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-  },
-  userId: {
-    type: String,
-    required: true,
-    index: true,
+  {
+    timestamps: true,
   }
-}, {
-  timestamps: true,
-});
+);
 
 interviewSchema.index({ userId: 1, date: 1 });
 
-export const Interview = mongoose.model<IInterviewDocument>("Interview", interviewSchema); 
+export const Interview = mongoose.model<IInterviewDocument>(
+  "Interview",
+  interviewSchema
+);

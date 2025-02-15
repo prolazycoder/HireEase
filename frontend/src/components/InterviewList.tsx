@@ -14,7 +14,7 @@ import InterviewForm, { InterviewFormData } from "./InterviewForm";
 
 interface Interview extends InterviewFormData {
   _id: string;
-  status: "scheduled" | "completed" | "cancelled";
+  status: "upcoming" | "ongoing" | "completed";
 }
 
 interface InterviewListProps {

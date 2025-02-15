@@ -16,24 +16,9 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
-interface FilterParams {
-  status?: string;
-  candidateName?: string;
-}
-
 export const interviewApi = {
   create: async (data: any) => {
     const response = await api.post("/api/interviews", data);
-    return response.data;
-  },
-
-  getInterviews: async (filters: FilterParams = {}) => {
-    const params = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) params.append(key, value);
-    });
-    
-    const response = await api.get(`/api/interviews?${params.toString()}`);
     return response.data;
   },
 
