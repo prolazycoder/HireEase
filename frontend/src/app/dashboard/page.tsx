@@ -3,16 +3,16 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { redirect } from "next/navigation";
-import axios from "axios";
-import { 
-  Button, 
-  Dialog, 
-  Container, 
+import { interviewApi } from "@/services/api";
+import {
+  Button,
+  Dialog,
+  Container,
   Typography,
   Paper,
-  Box
+  Box,
 } from "@mui/material";
-import { Add as AddIcon } from '@mui/icons-material';
+import { Add as AddIcon } from "@mui/icons-material";
 import InterviewForm, { InterviewFormData } from "@/components/InterviewForm";
 import InterviewList from "@/components/InterviewList";
 
@@ -38,15 +38,8 @@ export default function Dashboard() {
 
   const fetchInterviews = async () => {
     try {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/interviews/forthcoming`,
-        {
-          headers: {
-            Authorization: `Bearer ${session?.user?.token}`,
-          },
-        }
-      );
-      setInterviews(response.data.interviews);
+      const { interviews } = await interviewApi.getForthcoming();
+      setInterviews(interviews);
     } catch (error) {
       console.error("Failed to fetch interviews:", error);
     }
@@ -54,15 +47,7 @@ export default function Dashboard() {
 
   const handleCreateInterview = async (data: InterviewFormData) => {
     try {
-      await axios.post(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/interviews`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${session?.user?.token}`,
-          },
-        }
-      );
+      await interviewApi.create(data);
       setIsFormOpen(false);
       fetchInterviews();
     } catch (error) {
@@ -72,15 +57,7 @@ export default function Dashboard() {
 
   const handleEditInterview = async (id: string, data: InterviewFormData) => {
     try {
-      await axios.put(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/interviews/${id}`,
-        data,
-        {
-          headers: {
-            Authorization: `Bearer ${session?.user?.token}`,
-          },
-        }
-      );
+      await interviewApi.update(id, data);
       fetchInterviews();
     } catch (error) {
       console.error("Failed to update interview:", error);
@@ -89,14 +66,7 @@ export default function Dashboard() {
 
   const handleDeleteInterview = async (id: string) => {
     try {
-      await axios.delete(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/interviews/${id}`,
-        {
-          headers: {
-            Authorization: `Bearer ${session?.user?.token}`,
-          },
-        }
-      );
+      await interviewApi.delete(id);
       fetchInterviews();
     } catch (error) {
       console.error("Failed to delete interview:", error);
@@ -109,8 +79,13 @@ export default function Dashboard() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Paper elevation={0} sx={{ p: 3, bgcolor: 'background.default' }}>
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+      <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default" }}>
+        <Box
+          display="flex"
+          justifyContent="space-between"
+          alignItems="center"
+          mb={4}
+        >
           <Typography variant="h4" component="h1" color="primary">
             Upcoming Interviews
           </Typography>
@@ -118,11 +93,11 @@ export default function Dashboard() {
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setIsFormOpen(true)}
-            sx={{ 
-              bgcolor: 'primary.main',
-              '&:hover': {
-                bgcolor: 'primary.dark',
-              }
+            sx={{
+              bgcolor: "primary.main",
+              "&:hover": {
+                bgcolor: "primary.dark",
+              },
             }}
           >
             Schedule Interview
@@ -130,7 +105,9 @@ export default function Dashboard() {
         </Box>
 
         {interviews.length === 0 ? (
-          <Paper sx={{ p: 4, textAlign: 'center', bgcolor: 'background.paper' }}>
+          <Paper
+            sx={{ p: 4, textAlign: "center", bgcolor: "background.paper" }}
+          >
             <Typography variant="h6" color="text.secondary" gutterBottom>
               No upcoming interviews
             </Typography>
@@ -154,10 +131,10 @@ export default function Dashboard() {
         fullWidth
         PaperProps={{
           sx: {
-            bgcolor: 'background.paper',
+            bgcolor: "background.paper",
             boxShadow: 24,
             p: 4,
-          }
+          },
         }}
       >
         <Typography variant="h5" component="h2" color="primary" gutterBottom>
@@ -167,4 +144,4 @@ export default function Dashboard() {
       </Dialog>
     </Container>
   );
-} 
+}

@@ -2,9 +2,9 @@ import express, { Express } from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import { authRoutes } from './routes/auth.routes';
-import { interviewRoutes } from './routes/interview.routes';
-import { initializeDatabase } from './config/db.init';
+import authRoutes from "./routes/auth.routes";
+import { interviewRoutes } from "./routes/interview.routes";
+import { initializeDatabase } from "./config/db.init";
 
 // Load environment variables
 dotenv.config();
@@ -12,10 +12,14 @@ dotenv.config();
 const app: Express = express();
 
 // Middleware
-app.use(cors({
-  origin: process.env.CORS_ORIGIN,
-  credentials: true,
-}));
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json());
 
 // Database Connection with better error handling
@@ -30,14 +34,14 @@ mongoose
   });
 
 // Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/interviews', interviewRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/interviews", interviewRoutes);
 
 // Health check with DB status
 app.get("/health", (req, res) => {
-  res.json({ 
+  res.json({
     status: "ok",
-    dbState: mongoose.connection.readyState
+    dbState: mongoose.connection.readyState,
   });
 });
 

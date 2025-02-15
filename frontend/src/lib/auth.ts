@@ -1,6 +1,5 @@
 import { NextAuthOptions } from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
-import axios from "axios";
 
 export const authOptions: NextAuthOptions = {
   providers: [
@@ -9,71 +8,30 @@ export const authOptions: NextAuthOptions = {
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       authorization: {
         params: {
-          prompt: "select_account",
+          prompt: "consent",
           access_type: "offline",
           response_type: "code",
+          scope: "openid email profile",
         },
       },
     }),
   ],
   callbacks: {
-    async signIn({ user, account }) {
-      if (account?.provider === "google") {
-        try {
-          console.log("Sending user data to backend:", {
-            email: user.email,
-            name: user.name,
-            image: user.image,
-            googleId: account.providerAccountId,
-          });
-
-          const response = await axios.post(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/auth/google/callback`,
-            {
-              email: user.email,
-              name: user.name,
-              image: user.image,
-              googleId: account.providerAccountId,
-            },
-            {
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          );
-
-          console.log("Backend response:", response.data);
-          return true;
-        } catch (error) {
-          if (axios.isAxiosError(error)) {
-            console.error("Error saving user:", error.response?.data || error);
-          } else {
-            console.error("Error saving user:", error);
-          }
-          return true;
-        }
-      }
-      return true;
-    },
-    async session({ session, token }) {
-      if (session.user) {
-        session.user.id = token.sub;
-      }
-      return session;
-    },
     async jwt({ token, account }) {
-      if (account) {
-        token.accessToken = account.access_token;
+      if (account?.id_token) {
+        token.id_token = account.id_token;
       }
       return token;
     },
-  },
-  pages: {
-    signIn: "/",
-    // error: '/auth/error',
-    // signOut: '/auth/signout'
+    async session({ session, token }) {
+      if (token.id_token) {
+        session.accessToken = token.id_token as string;
+      }
+      return session;
+    },
   },
   session: {
     strategy: "jwt",
+    maxAge: 30 * 60, // 30 minutes
   },
 };

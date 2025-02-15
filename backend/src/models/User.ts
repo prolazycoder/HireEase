@@ -9,7 +9,9 @@ export interface IUser {
   updatedAt: Date;
 }
 
-export interface IUserDocument extends IUser, Document {}
+export interface IUserDocument extends IUser, Document {
+  _id: mongoose.Types.ObjectId;
+}
 
 const userSchema = new mongoose.Schema<IUserDocument>({
   email: { type: String, required: true, unique: true },

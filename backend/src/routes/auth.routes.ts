@@ -5,9 +5,8 @@ import { RequestHandler } from "express";
 
 const router = Router();
 
-router.use(authMiddleware as RequestHandler); 
+router.use(authMiddleware as RequestHandler);
 
-router.post("/google/callback", authController.googleCallback);
-router.get("/user/:id", authController.getUser);
+router.get("/user", authController.getUser);
 
-export const authRoutes = router;
+export default router;
