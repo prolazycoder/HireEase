@@ -1,5 +1,6 @@
 import { RequestHandler } from "express";
 import { Interview } from "../models/Interview";
+import { getCurrentDateTime } from "../utils/dateTime";
 
 export const interviewController = {
   createInterview: (async (req, res) => {
@@ -70,15 +71,12 @@ export const interviewController = {
       const { status, candidateName } = req.query;
       const query: any = { userId: req.user.id };
 
-      // Filter by candidate name if provided
       if (candidateName) {
         query.candidateName = { $regex: candidateName, $options: "i" };
       }
 
-      // Get current date and time
-      const now = new Date();
-      const currentDate = now.toISOString().split("T")[0];
-      const currentTime = now.toTimeString().split(" ")[0];
+      const { currentDate, currentTime } = getCurrentDateTime();
+      console.log("Current DateTime (IST):", { currentDate, currentTime });
 
       // Filter by status
       if (status === "upcoming") {
@@ -103,6 +101,8 @@ export const interviewController = {
         ];
       }
 
+      console.log("Query:", JSON.stringify(query, null, 2));
+
       const interviews = await Interview.find(query)
         .sort({ date: 1, startTime: 1 })
         .exec();
@@ -110,6 +110,12 @@ export const interviewController = {
       // Add dynamic status to each interview
       const interviewsWithStatus = interviews.map((interview) => {
         const doc = interview.toObject();
+        console.log("Interview DateTime:", {
+          date: doc.date,
+          startTime: doc.startTime,
+          endTime: doc.endTime,
+        });
+
         if (
           doc.date < currentDate ||
           (doc.date === currentDate && doc.endTime <= currentTime)
