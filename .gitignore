@@ -10,6 +10,7 @@ node_modules/
 **/serviceAccountKey.json
 **/credentials.json
 **/client_secret.json
+terminal
 
 # Build outputs
 dist/
