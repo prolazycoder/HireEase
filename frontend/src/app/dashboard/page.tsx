@@ -16,6 +16,7 @@ import { Add as AddIcon } from "@mui/icons-material";
 import InterviewForm, { InterviewFormData } from "@/components/InterviewForm";
 import InterviewList from "@/components/InterviewList";
 import { InterviewFilters } from "@/components/InterviewFilters";
+import { useMediaQuery } from "@mui/material";
 
 interface Interview extends InterviewFormData {
   _id: string;
@@ -34,6 +35,8 @@ export default function Dashboard() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [selectedStatus, setSelectedStatus] = useState("upcoming");
+
+  const matches = useMediaQuery("(max-width:600px)");
 
   const fetchInterviews = async (filters = { status: "upcoming" }) => {
     try {
@@ -103,32 +106,44 @@ export default function Dashboard() {
 
   return (
     <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Paper elevation={0} sx={{ p: 3, bgcolor: "background.default" }}>
+      <Paper
+        elevation={0}
+        sx={{ p: { xs: 2, sm: 3 }, bgcolor: "background.default" }}
+      >
         <Box
           display="flex"
+          flexDirection={{ xs: "column", sm: "row" }}
           justifyContent="space-between"
-          alignItems="center"
+          alignItems={{ xs: "stretch", sm: "center" }}
+          gap={2}
           mb={4}
         >
-          <Typography variant="h4" component="h1" color="primary">
+          <Typography
+            variant="h4"
+            component="h1"
+            color="primary"
+            sx={{
+              fontSize: { xs: "1.5rem", sm: "2rem" },
+              textAlign: { xs: "center", sm: "left" },
+            }}
+          >
             {getStatusHeading()}
           </Typography>
           <Button
             variant="contained"
             startIcon={<AddIcon />}
             onClick={() => setIsFormOpen(true)}
+            fullWidth={matches}
             sx={{
               bgcolor: "primary.main",
-              "&:hover": {
-                bgcolor: "primary.dark",
-              },
+              "&:hover": { bgcolor: "primary.dark" },
             }}
           >
             Schedule Interview
           </Button>
         </Box>
 
-        <InterviewFilters 
+        <InterviewFilters
           onFilterChange={handleFilterChange}
           defaultStatus="upcoming"
         />

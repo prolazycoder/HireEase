@@ -1,6 +1,7 @@
 import { RequestHandler } from "express";
 import { Interview } from "../models/Interview";
 import { getCurrentDateTime } from "../utils/dateTime";
+import { emailService } from "../services/email.service";
 
 export const interviewController = {
   createInterview: (async (req, res) => {
@@ -10,6 +11,10 @@ export const interviewController = {
         userId: req.user.id,
         status: "upcoming",
       });
+
+      // Send email notification
+      await emailService.sendInterviewCreated(interview);
+
       void res.status(201).json({ interview });
     } catch (error) {
       void res.status(500).json({ error: "Failed to create interview" });
@@ -19,17 +24,18 @@ export const interviewController = {
   updateInterview: (async (req, res) => {
     try {
       const interview = await Interview.findOneAndUpdate(
-        {
-          _id: req.params.id,
-          userId: req.user.id,
-        },
+        { _id: req.params.id, userId: req.user.id },
         req.body,
         { new: true }
       );
+
       if (!interview) {
-        void res.status(404).json({ error: "Interview not found" });
-        return;
+        return res.status(404).json({ error: "Interview not found" });
       }
+
+      // Send email notification
+      await emailService.sendInterviewUpdated(interview);
+
       void res.json({ interview });
     } catch (error) {
       void res.status(500).json({ error: "Failed to update interview" });
@@ -38,14 +44,20 @@ export const interviewController = {
 
   deleteInterview: (async (req, res) => {
     try {
-      const interview = await Interview.findOneAndDelete({
+      const interview = await Interview.findOne({
         _id: req.params.id,
         userId: req.user.id,
       });
+
       if (!interview) {
-        void res.status(404).json({ error: "Interview not found" });
-        return;
+        return res.status(404).json({ error: "Interview not found" });
       }
+
+      await Interview.deleteOne({ _id: req.params.id });
+
+      // Send email notification
+      await emailService.sendInterviewCancelled(interview);
+
       void res.json({ message: "Interview deleted successfully" });
     } catch (error) {
       void res.status(500).json({ error: "Failed to delete interview" });
