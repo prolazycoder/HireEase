@@ -26,15 +26,20 @@ export const Navbar = ({ session }: NavbarProps) => {
     <nav className="fixed top-0 w-full bg-white shadow-sm z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
-          {/* Logo */}
-          <Link href="/" className="relative w-[150px] h-[40px]">
-            <Image
-              src="/logo.svg"
-              alt="HireEase"
-              fill
-              className="object-contain"
-              priority
-            />
+          {/* Logo with Text */}
+          <Link href="/" className="flex items-center gap-2">
+            <div className="relative w-[40px] h-[40px]">
+              <Image
+                src="/logo.svg"
+                alt="HireEase"
+                fill
+                className="object-contain"
+                priority
+              />
+            </div>
+            <span className="text-xl font-semibold text-gray-800">
+              HireEase
+            </span>
           </Link>
 
           {/* Auth Section */}
