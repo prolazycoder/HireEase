@@ -11,25 +11,10 @@ api.interceptors.request.use(async (config) => {
 
   if (session?.accessToken) {
     config.headers.Authorization = `Bearer ${session.accessToken}`;
-  } else {
-    // No token found, sign out
-    signOut({ callbackUrl: "/" });
   }
-
+  // Don't sign out here, let NextAuth handle it
   return config;
 });
-
-// Add response interceptor to handle token expiration
-api.interceptors.response.use(
-  (response) => response,
-  async (error) => {
-    if (error.response?.status === 401) {
-      // Unauthorized, token might be expired
-      await signOut({ callbackUrl: "/" });
-    }
-    return Promise.reject(error);
-  }
-);
 
 interface FilterParams {
   status?: string;

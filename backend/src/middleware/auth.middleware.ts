@@ -13,7 +13,7 @@ declare global {
   }
 }
 
-const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+const client = new OAuth2Client();
 
 export const authMiddleware = async (
   req: Request,
@@ -29,28 +29,26 @@ export const authMiddleware = async (
 
     const token = authHeader.split(" ")[1];
 
+    // Verify token with Google
     const ticket = await client.verifyIdToken({
       idToken: token,
-      audience: process.env.GOOGLE_CLIENT_ID,
     });
 
     const payload = ticket.getPayload();
-    if (!payload) {
+    if (!payload?.sub || !payload?.email) {
       return res.status(401).json({ message: "Invalid token" });
     }
 
-    if (!payload.sub || !payload.email || !payload.name) {
-      return res.status(401).json({ message: "Invalid token payload" });
-    }
-
+    // Set user info from verified token
     req.user = {
       id: payload.sub,
       email: payload.email,
-      name: payload.name,
+      name: payload.name || payload.email,
     };
 
     next();
   } catch (error) {
+    console.error("Auth error:", error);
     return res.status(401).json({ message: "Invalid token" });
   }
 };
