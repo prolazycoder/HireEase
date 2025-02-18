@@ -17,17 +17,9 @@ const nextConfig = {
       },
     ];
   },
-  // Add CSS handling
-  compiler: {
-    styledComponents: true,
-  },
-  // Ensure CSS modules work
-  webpack(config) {
-    config.module.rules.push({
-      test: /\.css$/,
-      use: ['style-loader', 'css-loader'],
-    });
-    return config;
+  // Remove webpack and compiler config
+  experimental: {
+    appDir: true,
   },
 }
 
