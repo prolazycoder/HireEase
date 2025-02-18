@@ -5,7 +5,10 @@ import { NextAuthProvider } from "@/providers/auth-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
 import { Navbar } from "@/components/common/Navbar";
 import { authOptions } from "@/lib/auth";
-import "./globals.css";
+import "@/styles/globals.css";
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from '@/theme';
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,8 +32,11 @@ export default async function RootLayout({
       <body className={`${inter.variable} antialiased`}>
         <NextAuthProvider>
           <ThemeProvider>
-            <Navbar session={session} />
-            <main className="pt-16">{children}</main>
+            <MuiThemeProvider theme={theme}>
+              <CssBaseline />
+              <Navbar session={session} />
+              <main className="pt-16">{children}</main>
+            </MuiThemeProvider>
           </ThemeProvider>
         </NextAuthProvider>
       </body>
