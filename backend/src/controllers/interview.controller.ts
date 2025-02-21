@@ -100,6 +100,11 @@ export const interviewController = {
             endTime: { $gt: currentTime },
           },
           {
+            date: currentDate, // Interview started today
+            startTime: { $lte: currentTime }, // Started before current time
+            $expr: { $lt: ["$endTime", "$startTime"] }, // End time is before start time → crosses midnight
+          },
+          {
             date: { $lt: currentDate },
             endTime: { $gt: currentTime },
           },
