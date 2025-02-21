@@ -22,6 +22,10 @@ export const interviewController = {
         userId: req.user.id,
         status: "upcoming",
       });
+      console.log('Request body before UTC conversion:', req.body);
+      console.log('UTC times:', { startTime, endTime });
+      console.log('Created interview:', interview.toObject());
+
 
       // Convert times back to local for response
       const localInterview = {
