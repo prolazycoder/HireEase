@@ -43,4 +43,9 @@ app.get("/health", (req, res) => {
   });
 });
 
+app.get("/test", (req, res) => {
+  res.json({ message: "Test route is working" });
+});
+
+
 export default app;
