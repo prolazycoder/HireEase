@@ -8,13 +8,13 @@ const nextConfig = {
   env: {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
   },
-  // Add this to handle API routes
+  // Remove API rewrites since we're using external API
   async rewrites() {
     return [
       {
-        source: '/api/:path*',
-        destination: '/api/:path*',
-      },
+        source: '/api/auth/:path*',
+        destination: '/api/auth/:path*',
+      }
     ];
   },
   // Add CSS handling
