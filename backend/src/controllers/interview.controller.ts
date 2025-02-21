@@ -1,43 +1,19 @@
 import { RequestHandler } from "express";
 import { Interview } from "../models/Interview";
-import {
-  getCurrentDateTime,
-  convertToUTC,
-  convertToLocal,
-} from "../utils/dateTime";
+import { getCurrentDateTime } from "../utils/dateTime";
 import { emailService } from "../services/email.service";
 
 export const interviewController = {
   createInterview: (async (req, res) => {
     try {
-      // Convert input time to UTC
-      const startTime = convertToUTC(req.body.date, req.body.startTime);
-      const endTime = convertToUTC(req.body.date, req.body.endTime);
-
       const interview = await Interview.create({
         ...req.body,
-        date: startTime.date,
-        startTime: startTime.time,
-        endTime: endTime.time,
         userId: req.user.id,
         status: "upcoming",
       });
-      console.log('Request body before UTC conversion:', req.body);
-      console.log('UTC times:', { startTime, endTime });
-      console.log('Created interview:', interview.toObject());
 
+      res.status(201).json({ interview });
 
-      // Convert times back to local for response
-      const localInterview = {
-        ...interview.toObject(),
-        date: convertToLocal(interview.date, interview.startTime).date,
-        startTime: convertToLocal(interview.date, interview.startTime).time,
-        endTime: convertToLocal(interview.date, interview.endTime).time,
-      };
-
-      res.status(201).json({ interview: localInterview });
-
-      // Handle email separately
       try {
         await emailService.sendInterviewScheduled(interview);
       } catch (emailError) {
@@ -50,18 +26,9 @@ export const interviewController = {
 
   updateInterview: (async (req, res) => {
     try {
-      // Convert input times to UTC
-      const startTime = convertToUTC(req.body.date, req.body.startTime);
-      const endTime = convertToUTC(req.body.date, req.body.endTime);
-
       const interview = await Interview.findOneAndUpdate(
         { _id: req.params.id, userId: req.user.id },
-        {
-          ...req.body,
-          date: startTime.date,
-          startTime: startTime.time,
-          endTime: endTime.time,
-        },
+        { ...req.body },
         { new: true }
       );
 
@@ -69,17 +36,8 @@ export const interviewController = {
         return res.status(404).json({ error: "Interview not found" });
       }
 
-      // Convert times back to local for response
-      const localInterview = {
-        ...interview.toObject(),
-        date: convertToLocal(interview.date, interview.startTime).date,
-        startTime: convertToLocal(interview.date, interview.startTime).time,
-        endTime: convertToLocal(interview.date, interview.endTime).time,
-      };
+      res.json({ interview });
 
-      res.json({ interview: localInterview });
-
-      // Handle email separately
       try {
         await emailService.sendInterviewUpdated(interview);
       } catch (emailError) {
@@ -128,10 +86,7 @@ export const interviewController = {
 
       const { currentDate, currentTime } = getCurrentDateTime();
 
-      console.log("currentDate:", currentDate);
-      console.log("CurrentTime:", currentTime);
-
-      // Filter by status using UTC times
+      // Filter by status
       if (status === "upcoming") {
         query.$or = [
           { date: { $gt: currentDate } },
@@ -154,26 +109,11 @@ export const interviewController = {
         ];
       }
 
-      console.log("Query:", query);
-      console.log("Flattened Query:", JSON.stringify(query, null, 2));
-
       const interviews = await Interview.find(query)
         .sort({ date: 1, startTime: 1 })
         .exec();
 
-      // Convert times to local for response
-      const localInterviews = interviews.map((interview) => {
-        const doc = interview.toObject();
-        const local = {
-          ...doc,
-          date: convertToLocal(doc.date, doc.startTime).date,
-          startTime: convertToLocal(doc.date, doc.startTime).time,
-          endTime: convertToLocal(doc.date, doc.endTime).time,
-        };
-        return local;
-      });
-
-      res.json({ interviews: localInterviews });
+      res.json({ interviews });
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch interviews" });
     }

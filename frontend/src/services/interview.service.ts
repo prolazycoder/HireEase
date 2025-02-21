@@ -1,5 +1,6 @@
 import axios from "axios";
 import { getSession, signOut } from "next-auth/react";
+import { toUTC, toLocal } from "../utils/dateTime";
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -41,28 +42,51 @@ interface FilterParams {
 
 export const interviewApi = {
   create: async (data: any) => {
-    const response = await api.post("/api/interviews", data);
+    // Convert to UTC before sending
+    const utcTime = toUTC(data.date, data.startTime);
+    const utcEndTime = toUTC(data.date, data.endTime);
+
+    const response = await api.post("/api/interviews", {
+      ...data,
+      date: utcTime.date,
+      startTime: utcTime.time,
+      endTime: utcEndTime.time,
+    });
     return response.data;
   },
 
   getInterviews: async (filters: FilterParams = {}) => {
     const params = new URLSearchParams();
-
-    // Set default status to 'upcoming' if not provided
     const status = filters.status || "upcoming";
     params.append("status", status);
 
-    // Add other filters if present
     if (filters.candidateName) {
       params.append("candidateName", filters.candidateName);
     }
 
     const response = await api.get(`/api/interviews?${params.toString()}`);
-    return response.data;
+
+    // Convert UTC to local for display
+    const interviews = response.data.interviews.map((interview: any) => ({
+      ...interview,
+      ...toLocal(interview.date, interview.startTime),
+      endTime: toLocal(interview.date, interview.endTime).time,
+    }));
+
+    return { interviews };
   },
 
   update: async (id: string, data: any) => {
-    const response = await api.put(`/api/interviews/${id}`, data);
+    // Convert to UTC before sending
+    const utcTime = toUTC(data.date, data.startTime);
+    const utcEndTime = toUTC(data.date, data.endTime);
+
+    const response = await api.put(`/api/interviews/${id}`, {
+      ...data,
+      date: utcTime.date,
+      startTime: utcTime.time,
+      endTime: utcEndTime.time,
+    });
     return response.data;
   },
 
