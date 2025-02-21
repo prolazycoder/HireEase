@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TextField, Button } from "@mui/material";
 
 interface InterviewFormProps {
@@ -19,15 +19,43 @@ export interface InterviewFormData {
   description?: string;
 }
 
-export default function InterviewForm({ onSubmit, initialData, buttonText = "Schedule Interview" }: InterviewFormProps) {
+const getCurrentDateTime = () => {
+  const now = new Date();
+  const date = now.toISOString().split("T")[0];
+  const time = now.toLocaleTimeString("en-US", {
+    hour12: false,
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
+  // Add 1 hour for end time
+  const endTime = new Date(now.getTime() + 60 * 60 * 1000).toLocaleTimeString(
+    "en-US",
+    {
+      hour12: false,
+      hour: "2-digit",
+      minute: "2-digit",
+    }
+  );
+
+  return { date, time, endTime };
+};
+
+export default function InterviewForm({
+  onSubmit,
+  initialData,
+  buttonText = "Schedule Interview",
+}: InterviewFormProps) {
+  const { date, time, endTime } = getCurrentDateTime();
+
   const [formData, setFormData] = useState<InterviewFormData>(
     initialData || {
       title: "",
       candidateName: "",
       candidateEmail: "",
-      date: new Date().toISOString().split('T')[0],
-      startTime: "09:00",
-      endTime: "10:00",
+      date: date,
+      startTime: time,
+      endTime: endTime,
       description: "",
     }
   );
@@ -50,7 +78,9 @@ export default function InterviewForm({ onSubmit, initialData, buttonText = "Sch
         fullWidth
         label="Candidate Name"
         value={formData.candidateName}
-        onChange={(e) => setFormData({ ...formData, candidateName: e.target.value })}
+        onChange={(e) =>
+          setFormData({ ...formData, candidateName: e.target.value })
+        }
         required
       />
       <TextField
@@ -58,7 +88,9 @@ export default function InterviewForm({ onSubmit, initialData, buttonText = "Sch
         type="email"
         label="Candidate Email"
         value={formData.candidateEmail}
-        onChange={(e) => setFormData({ ...formData, candidateEmail: e.target.value })}
+        onChange={(e) =>
+          setFormData({ ...formData, candidateEmail: e.target.value })
+        }
         required
       />
       <TextField
@@ -74,14 +106,18 @@ export default function InterviewForm({ onSubmit, initialData, buttonText = "Sch
           type="time"
           label="Start Time"
           value={formData.startTime}
-          onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, startTime: e.target.value })
+          }
           required
         />
         <TextField
           type="time"
           label="End Time"
           value={formData.endTime}
-          onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+          onChange={(e) =>
+            setFormData({ ...formData, endTime: e.target.value })
+          }
           required
         />
       </div>
@@ -91,11 +127,13 @@ export default function InterviewForm({ onSubmit, initialData, buttonText = "Sch
         rows={4}
         label="Description"
         value={formData.description}
-        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+        onChange={(e) =>
+          setFormData({ ...formData, description: e.target.value })
+        }
       />
       <Button type="submit" variant="contained" fullWidth>
         {buttonText}
       </Button>
     </form>
   );
-} 
+}

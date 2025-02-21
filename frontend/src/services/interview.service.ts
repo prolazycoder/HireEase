@@ -20,6 +20,20 @@ api.interceptors.request.use(async (config) => {
   return config;
 });
 
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    if (error.response?.status === 401) {
+      // Sign out and redirect to home page
+      await signOut({ callbackUrl: "/" });
+      return Promise.reject(
+        new Error("Session expired. Please sign in again.")
+      );
+    }
+    return Promise.reject(error);
+  }
+);
+
 interface FilterParams {
   status?: string;
   candidateName?: string;
