@@ -52,11 +52,7 @@ export const interviewApi = {
       startTime: utcTime.time,
       endTime: utcEndTime.time,
     });
-    console.log("startTime:", data.startTime);
-    console.log("endTime:", data.endTime);
-    console.log("utcTime:", utcTime);
-    console.log("utcEndTime:", utcEndTime);
-    console.log("response:", response.data);
+
     return response.data;
   },
 
@@ -82,15 +78,10 @@ export const interviewApi = {
     // Convert UTC to local for display
     const interviews = response.data.interviews.map((interview: any) => ({
       ...interview,
+      date: toLocal(interview.date, interview.startTime).date,
       startTime: toLocal(interview.date, interview.startTime).time,
       endTime: toLocal(interview.date, interview.endTime).time,
     }));
-
-    console.log("Filters:", filters);
-    console.log("Current UTC date:", utcDate);
-    console.log("Current UTC time:", utcTime);
-    console.log("Raw response:", response.data);
-    console.log("Processed interviews:", interviews);
 
     return { interviews };
   },

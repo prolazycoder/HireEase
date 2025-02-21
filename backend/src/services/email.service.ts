@@ -2,10 +2,12 @@ import nodemailer from "nodemailer";
 import { IInterview } from "../models/Interview";
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: "smtp.gmail.com",
+  port: 465, 
+  secure: true,
   auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_APP_PASSWORD,
+    user: process.env.SMTP_USER, 
+    pass: process.env.SMTP_PASSWORD, 
   },
 });
 
@@ -25,7 +27,7 @@ export const emailService = {
     `;
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: process.env.SMTP,
       to: interview.candidateEmail,
       subject: `Interview Scheduled: ${interview.title}`,
       html: emailContent,
@@ -47,7 +49,7 @@ export const emailService = {
     `;
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: process.env.SMTP_USER,
       to: interview.candidateEmail,
       subject: `Interview Updated: ${interview.title}`,
       html: emailContent,
@@ -68,7 +70,7 @@ export const emailService = {
     `;
 
     await transporter.sendMail({
-      from: process.env.EMAIL_USER,
+      from: process.env.SMTP_USER,
       to: interview.candidateEmail,
       subject: `Interview Cancelled: ${interview.title}`,
       html: emailContent,
