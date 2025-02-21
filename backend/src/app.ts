@@ -13,7 +13,7 @@ const app: Express = express();
 // Middleware
 app.use(
   cors({
-    origin: ["https://hire-ease-kappa.vercel.app"],
+    origin: process.env.CORS_ORIGIN,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -41,10 +41,6 @@ app.get("/health", (req, res) => {
     status: "ok",
     dbState: mongoose.connection.readyState,
   });
-});
-
-app.get("/test", (req, res) => {
-  res.json({ message: "Test route is working" });
 });
 
 

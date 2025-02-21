@@ -2,7 +2,11 @@ import axios from "axios";
 import { getSession, signOut } from "next-auth/react";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: 'https://hireease-production.up.railway.app',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  withCredentials: true
 });
 
 // Add request interceptor to add token
