@@ -95,18 +95,26 @@ export const interviewController = {
       } else if (status === "ongoing") {
         query.$or = [
           {
-            date: currentDate,
-            startTime: { $lte: currentTime },
-            endTime: { $gt: currentTime },
+            $and: [
+              { date: currentDate },
+              { startTime: { $lte: currentTime } }, // Started before current time
+              { endTime: { $gt: currentTime } }, // Ends after current time
+            ],
+          },
+
+          {
+            $and: [
+              { date: currentDate }, // Interview started today
+              { startTime: { $lte: currentTime } }, // Started before current time
+              { $expr: { $lt: ["$endTime", "$startTime"] } },
+            ],
           },
           {
-            date: currentDate, // Interview started today
-            startTime: { $lte: currentTime }, // Started before current time
-            $expr: { $lt: ["$endTime", "$startTime"] }, // End time is before start time → crosses midnight
-          },
-          {
-            date: { $lt: currentDate },
-            endTime: { $gt: currentTime },
+            $and: [
+              { date: { $lt: currentDate } }, 
+              { $expr: { $lt: ["$endTime", "$startTime"] } }, 
+              { endTime: { $gt: currentTime } }, // Still ongoing
+            ],
           },
         ];
       } else if (status === "completed") {

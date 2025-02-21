@@ -3,11 +3,11 @@ import { IInterview } from "../models/Interview";
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465, 
+  port: 465,
   secure: true,
   auth: {
-    user: process.env.SMTP_USER, 
-    pass: process.env.SMTP_PASSWORD, 
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASSWORD,
   },
 });
 
@@ -18,16 +18,18 @@ export const emailService = {
       <p>Dear ${interview.candidateName},</p>
       <p>Your interview has been scheduled:</p>
       <ul>
-        <li>Title: ${interview.title}</li>
-        <li>Date: ${interview.date}</li>
-        <li>Time: ${interview.startTime} - ${interview.endTime}</li>
+        <li><strong>Title:</strong> ${interview.title}</li>
+        <li><strong>Date:</strong> ${interview.date} <strong>(UTC)</strong></li>
+        <li><strong>Time:</strong> ${interview.startTime} - ${
+      interview.endTime
+    } <strong>(UTC)</strong></li>
       </ul>
       <p>${interview.description || ""}</p>
       <p>Best regards,<br>HireEase Team</p>
     `;
 
     await transporter.sendMail({
-      from: process.env.SMTP,
+      from: process.env.SMTP_USER,
       to: interview.candidateEmail,
       subject: `Interview Scheduled: ${interview.title}`,
       html: emailContent,
@@ -40,9 +42,11 @@ export const emailService = {
       <p>Dear ${interview.candidateName},</p>
       <p>Your interview has been updated:</p>
       <ul>
-        <li>Title: ${interview.title}</li>
-        <li>Date: ${interview.date}</li>
-        <li>Time: ${interview.startTime} - ${interview.endTime}</li>
+        <li><strong>Title:</strong> ${interview.title}</li>
+        <li><strong>Date:</strong> ${interview.date} <strong>(UTC)</strong></li>
+        <li><strong>Time:</strong> ${interview.startTime} - ${
+      interview.endTime
+    } <strong>(UTC)</strong></li>
       </ul>
       <p>${interview.description || ""}</p>
       <p>Best regards,<br>HireEase Team</p>
@@ -62,9 +66,9 @@ export const emailService = {
       <p>Dear ${interview.candidateName},</p>
       <p>Your interview has been cancelled:</p>
       <ul>
-        <li>Title: ${interview.title}</li>
-        <li>Date: ${interview.date}</li>
-        <li>Time: ${interview.startTime} - ${interview.endTime}</li>
+        <li><strong>Title:</strong> ${interview.title}</li>
+        <li><strong>Date:</strong> ${interview.date} <strong>(UTC)</strong></li>
+        <li><strong>Time:</strong> ${interview.startTime} - ${interview.endTime} <strong>(UTC)</strong></li>
       </ul>
       <p>Best regards,<br>HireEase Team</p>
     `;
