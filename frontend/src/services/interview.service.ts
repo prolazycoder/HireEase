@@ -2,11 +2,11 @@ import axios from "axios";
 import { getSession, signOut } from "next-auth/react";
 
 const api = axios.create({
-  baseURL: 'https://hireease-production.up.railway.app',
+  baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
   },
-  withCredentials: true
+  withCredentials: true,
 });
 
 // Add request interceptor to add token
@@ -33,16 +33,17 @@ export const interviewApi = {
 
   getInterviews: async (filters: FilterParams = {}) => {
     const params = new URLSearchParams();
-    Object.entries(filters).forEach(([key, value]) => {
-      if (value) params.append(key, value);
-    });
+
+    // Set default status to 'upcoming' if not provided
+    const status = filters.status || "upcoming";
+    params.append("status", status);
+
+    // Add other filters if present
+    if (filters.candidateName) {
+      params.append("candidateName", filters.candidateName);
+    }
 
     const response = await api.get(`/api/interviews?${params.toString()}`);
-    return response.data;
-  },
-
-  getForthcoming: async () => {
-    const response = await api.get("/api/interviews/forthcoming");
     return response.data;
   },
 

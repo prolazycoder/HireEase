@@ -38,7 +38,7 @@ export default function Dashboard() {
 
   const matches = useMediaQuery("(max-width:600px)");
 
-  const fetchInterviews = async (filters = { status: "upcoming" }) => {
+  const fetchInterviews = async (filters = { status: selectedStatus }) => {
     try {
       setLoading(true);
       const { interviews } = await interviewApi.getInterviews(filters);
@@ -55,8 +55,17 @@ export default function Dashboard() {
     fetchInterviews(filters);
   };
 
+  const handleDeleteInterview = async (id: string) => {
+    try {
+      await interviewApi.delete(id);
+      fetchInterviews({ status: selectedStatus });
+    } catch (error) {
+      console.error("Failed to delete interview:", error);
+    }
+  };
+
   useEffect(() => {
-    fetchInterviews();
+    fetchInterviews({ status: selectedStatus });
   }, []);
 
   const handleCreateInterview = async (data: InterviewFormData) => {
@@ -75,15 +84,6 @@ export default function Dashboard() {
       fetchInterviews();
     } catch (error) {
       console.error("Failed to update interview:", error);
-    }
-  };
-
-  const handleDeleteInterview = async (id: string) => {
-    try {
-      await interviewApi.delete(id);
-      fetchInterviews();
-    } catch (error) {
-      console.error("Failed to delete interview:", error);
     }
   };
 

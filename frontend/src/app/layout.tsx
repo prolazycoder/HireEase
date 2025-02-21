@@ -7,10 +7,7 @@ import { Navbar } from "@/components/Navbar";
 import { authOptions } from "@/lib/auth";
 import "./globals.css";
 
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-inter",
-});
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "HireEase - Interview Management",
@@ -19,14 +16,14 @@ export const metadata: Metadata = {
 
 export default async function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   const session = await getServerSession(authOptions);
 
   return (
     <html lang="en">
-      <body className={`${inter.variable} antialiased`}>
+      <body className={inter.className}>
         <NextAuthProvider>
           <ThemeProvider>
             <Navbar session={session} />
