@@ -5,7 +5,7 @@ import { RequestHandler } from "express";
 
 const router = Router();
 
-// router.use(authMiddleware as RequestHandler); 
+router.use(authMiddleware as RequestHandler); 
 
 router.post("/", interviewController.createInterview);
 router.get("/", interviewController.getInterviews);
