@@ -17,16 +17,18 @@ export const getCurrentDateTime = () => {
 
 export const convertToUTC = (date: string, time: string) => {
   const localDateTime = new Date(`${date}T${time}`);
+
+  // Convert to UTC time properly
+  const utcDateTime = new Date(
+    localDateTime.getTime() - localDateTime.getTimezoneOffset() * 60000
+  );
+
   return {
-    date: localDateTime.toISOString().split('T')[0],
-    time: localDateTime.toLocaleTimeString('en-US', {
-      hour12: false,
-      hour: '2-digit',
-      minute: '2-digit',
-      timeZone: 'UTC'
-    })
+    date: utcDateTime.toISOString().split("T")[0], // YYYY-MM-DD in UTC
+    time: utcDateTime.toISOString().split("T")[1].substring(0, 5), // HH:MM in UTC
   };
 };
+
 
 export const convertToLocal = (date: string, time: string) => {
   const utcDateTime = new Date(`${date}T${time}Z`);
