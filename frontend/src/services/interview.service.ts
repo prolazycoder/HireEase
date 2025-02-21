@@ -64,6 +64,14 @@ export const interviewApi = {
       params.append("candidateName", filters.candidateName);
     }
 
+    // Add current UTC time to params
+    const now = new Date();
+    const utcDate = now.toISOString().split('T')[0];
+    const utcTime = now.toISOString().split('T')[1].substring(0, 5);
+    
+    params.append("currentDate", utcDate);
+    params.append("currentTime", utcTime);
+
     const response = await api.get(`/api/interviews?${params.toString()}`);
 
     // Convert UTC to local for display

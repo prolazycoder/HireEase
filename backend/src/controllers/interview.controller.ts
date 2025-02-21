@@ -1,6 +1,5 @@
 import { RequestHandler } from "express";
 import { Interview } from "../models/Interview";
-import { getCurrentDateTime } from "../utils/dateTime";
 import { emailService } from "../services/email.service";
 
 export const interviewController = {
@@ -77,16 +76,14 @@ export const interviewController = {
 
   getInterviews: (async (req, res) => {
     try {
-      const { status, candidateName } = req.query;
+      const { status, candidateName, currentDate, currentTime } = req.query;
       const query: any = { userId: req.user.id };
 
       if (candidateName) {
         query.candidateName = { $regex: candidateName, $options: "i" };
       }
 
-      const { currentDate, currentTime } = getCurrentDateTime();
-
-      // Filter by status
+      // Use UTC time from request params
       if (status === "upcoming") {
         query.$or = [
           { date: { $gt: currentDate } },
