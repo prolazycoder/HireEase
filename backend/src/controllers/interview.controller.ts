@@ -20,6 +20,7 @@ export const interviewController = {
         startTime: startTime.time,
         endTime: endTime.time,
         userId: req.user.id,
+        status: "upcoming",
       });
 
       // Convert times back to local for response
@@ -34,7 +35,7 @@ export const interviewController = {
 
       // Handle email separately
       try {
-        await emailService.sendInterviewCreated(interview);
+        await emailService.sendInterviewScheduled(interview);
       } catch (emailError) {
         console.error("Failed to send email:", emailError);
       }
