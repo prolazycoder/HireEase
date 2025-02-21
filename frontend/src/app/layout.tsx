@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 import { getServerSession } from "next-auth";
 import { NextAuthProvider } from "@/providers/auth-provider";
 import { ThemeProvider } from "@/providers/theme-provider";
-import { Navbar } from "@/components/common/Navbar";
+import { Navbar } from "@/components/Navbar";
 import { authOptions } from "@/lib/auth";
 import "./globals.css";
 
