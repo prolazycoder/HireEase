@@ -93,9 +93,17 @@ export const interviewController = {
           },
         ];
       } else if (status === "ongoing") {
-        query.date = currentDate;
-        query.startTime = { $lte: currentTime };
-        query.endTime = { $gt: currentTime };
+        query.$or = [
+          {
+            date: currentDate,
+            startTime: { $lte: currentTime },
+            endTime: { $gt: currentTime },
+          },
+          {
+            date: { $lt: currentDate },
+            endTime: { $gt: currentTime },
+          },
+        ];
       } else if (status === "completed") {
         query.$or = [
           { date: { $lt: currentDate } },
