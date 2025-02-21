@@ -147,6 +147,8 @@ export const interviewController = {
         ];
       }
 
+      console.log("Query:", query);
+
       const interviews = await Interview.find(query)
         .sort({ date: 1, startTime: 1 })
         .exec();
