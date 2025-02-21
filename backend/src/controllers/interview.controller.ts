@@ -124,6 +124,9 @@ export const interviewController = {
 
       const { currentDate, currentTime } = getCurrentDateTime();
 
+      console.log("currentDate:", currentDate);
+      console.log("CurrentTime:", currentTime);
+
       // Filter by status using UTC times
       if (status === "upcoming") {
         query.$or = [
@@ -148,6 +151,7 @@ export const interviewController = {
       }
 
       console.log("Query:", query);
+      console.log("Flattened Query:", JSON.stringify(query, null, 2));
 
       const interviews = await Interview.find(query)
         .sort({ date: 1, startTime: 1 })
