@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { TextField, Button } from "@mui/material";
+import { getCurrentDateTime } from "../utils/dateTime"
 
 interface InterviewFormProps {
   onSubmit: (data: InterviewFormData) => void;
@@ -18,28 +19,6 @@ export interface InterviewFormData {
   endTime: string;
   description?: string;
 }
-
-const getCurrentDateTime = () => {
-  const now = new Date();
-  const date = now.toISOString().split("T")[0];
-  const time = now.toLocaleTimeString("en-US", {
-    hour12: false,
-    hour: "2-digit",
-    minute: "2-digit",
-  });
-
-  // Add 1 hour for end time
-  const endTime = new Date(now.getTime() + 60 * 60 * 1000).toLocaleTimeString(
-    "en-US",
-    {
-      hour12: false,
-      hour: "2-digit",
-      minute: "2-digit",
-    }
-  );
-
-  return { date, time, endTime };
-};
 
 export default function InterviewForm({
   onSubmit,
