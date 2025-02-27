@@ -137,21 +137,6 @@ vercel
 
 ---
 
-## 📜 API Endpoints
-
-| Endpoint                      | Method   | Description                    |
-| ----------------------------- | -------- | ------------------------------ |
-| `/api/auth/register`          | `POST`   | Register a new user            |
-| `/api/auth/login`             | `POST`   | Login and receive JWT          |
-| `/api/interviews`             | `GET`    | Fetch all interviews           |
-| `/api/interviews`             | `POST`   | Create a new interview         |
-| `/api/interviews/:id`         | `PUT`    | Update interview details       |
-| `/api/interviews/:id`         | `DELETE` | Delete an interview            |
-| `/api/auth/google/callback`   | `GET`    | Google authentication callback |
-| `/api/auth/user/:id`          | `GET`    | Get user details               |
-| `/api/interviews/forthcoming` | `GET`    | Get upcoming interviews        |
-
----
 
 ## 🤝 Contributing
 
